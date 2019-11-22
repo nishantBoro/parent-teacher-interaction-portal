@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Registration</title>
+</head>
+<body>
+    <div id="navbar">
+        <ul>
+            <li><a href="./index.html">Home</a></li>
+            <li><a href="./login.html">Login</a></li>
+            <li><a href="./registration.html">Register</a></li>
+        </ul>
+    </div>
+
+    <div id="info">
+        <form method="post" action="">
+            <label for="email">Email Address</label>
+            <input class="input-text" type="text" id="email" name="email" placeholder="Enter your e-mail">
+
+            <label for="password">Password</label>
+            <input class="input-text" type="password" id="password" name="password" placeholder="Enter your password">
+            <br><br>
+            <input class="submit-button" type="submit" value="Submit">
+        </form>
+    </div>
+</body>
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+    }
+
+    #navbar ul {
+        margin: 0;
+        padding: 15px;
+        list-style-type: none;
+        text-align: center;
+        background-color: #000;
+    }
+
+    #navbar ul li {
+        display: inline;
+    }
+
+    #navbar ul li a {
+        text-decoration: none;
+        padding: .2em 1em;
+        color: #fff;
+        background-color: #000;
+        font-size: 20px;
+    }
+
+    #navbar ul li a:hover {
+        color: #000;
+        background-color: #fff;
+    }
+
+    .submit-button {
+        background: gray;
+        color: #fff;
+        border: 1px solid #eee;
+        border-radius: 2px;
+        box-shadow: 5px 5px 5px #eee;
+        text-shadow:none;
+        padding: 10px;
+        font-size: 20px;
+    }
+
+    .submit-button:hover {
+        background: darkgray;
+        color: #fff;
+        border: 1px solid #eee;
+        border-radius: 2px;
+        box-shadow: 5px 5px 5px #eee;
+        text-shadow:none;
+    }
+
+    .input-text {
+        width: 100%;
+        padding: 12px 20px;
+        margin: 8px 0;
+        display: inline-block;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+
+    #info {
+        padding: 0;
+        margin: 50px auto;
+
+        width: 50%;
+    }
+
+</style>
+
+</html>

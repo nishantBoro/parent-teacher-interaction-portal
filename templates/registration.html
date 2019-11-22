@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Registration</title>
+</head>
+<body>
+    <div id="navbar">
+        <ul>
+            <li><a href="./index.html">Home</a></li>
+            <li><a href="./login.html">Login</a></li>
+            <li><a href="./registration.html">Register</a></li>
+        </ul>
+    </div>
+    <div id="form">
+        <form>
+            <h2>Register as:</h2>
+            <p>
+                <input class="radio-button" id="parentChecked" name="choice" type="radio" onclick="window.location='/registration-parent'">
+                <label for="parentChecked">Parent</label></p>
+            <p>
+                <input class="radio-button" id="teacherChecked" name="choice" type="radio" onclick="window.location='/registration-teacher'">
+                <label for="teacherChecked">Teacher</label></p>
+        </form>
+    </div>
+
+
+</body>
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+    }
+
+    #navbar ul {
+        margin: 0;
+        padding: 15px;
+        list-style-type: none;
+        text-align: center;
+        background-color: #000;
+    }
+
+    #navbar ul li {
+        display: inline;
+    }
+
+    #navbar ul li a {
+        text-decoration: none;
+        padding: .2em 1em;
+        color: #fff;
+        background-color: #000;
+        font-size: 20px;
+    }
+
+    #navbar ul li a:hover {
+        color: #000;
+        background-color: #fff;
+    }
+
+    #form {
+        padding: 0;
+        margin-left: 900px;
+        margin-top: 300px;
+    }
+</style>
+</html>

@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Home</title>
+</head>
+<body>
+<div id="navbar">
+    <ul>
+        <li><a href="/">Home</a></li>
+        {% if session['logged_in'] %}
+            <li><a href="/logout">Logout</a></li>
+        {% else %}
+            <li><a href="/login">Login</a></li>
+        {% endif %}
+        <li><a href="/register">Register</a></li>
+        {% if session['logged_in_as'] == 'Teacher' %}
+            <li><a href="/dashboard-teacher">Dashboard</a></li>
+        {% else if session['logged_in_as'] == 'Parent' %}
+            <li><a href="/dashboard-parent">Dashboard</a></li>
+        {% endif %}
+    </ul>
+
+    <img src="./images/home_page.png" alt="Parent Teacher Interaction Portal" width="200"
+         height="80">
+</div>
+</body>
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+    }
+
+    #navbar ul {
+        margin: 0;
+        padding: 15px;
+        list-style-type: none;
+        text-align: center;
+        background-color: #000;
+    }
+
+    #navbar ul li {
+        display: inline;
+    }
+
+    #navbar ul li a {
+        text-decoration: none;
+        padding: .2em 1em;
+        color: #fff;
+        background-color: #000;
+        font-size: 20px;
+    }
+
+    #navbar ul li a:hover {
+        color: #000;
+        background-color: #fff;
+    }
+</style>
+</html>

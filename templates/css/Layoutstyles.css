@@ -1,0 +1,70 @@
+
+body {
+  background-color: rgba(0, 100, 0, 0.2);
+}
+
+
+/* the logo area styling at the top */
+#logoArea {
+      width: 100%;
+      height: auto;
+      background-color: rgba(50, 200, 50, 0.5);
+      border: collapse;
+      margin-bottom:0px;
+      padding-bottom: 3px;
+      padding-top: 5px;
+      border: 1px solid green;
+
+}
+/* home bar codes for the top links */
+#homeBar {
+      width: 100%;
+      height: auto;
+      background-color: rgba(50, 50, 200, 0.5);
+      margin: auto;
+      display: grid;
+      grid-template-columns: 100px 100px 100px 150px 100px 100px;
+      padding: 4px 0px 4px 0px;
+      border: 1px solid green;
+
+
+}
+
+
+.homeLinks {
+      border: 1px solid blue;
+      padding: 5px;
+      text-decoration: none;
+      color: black;
+      background-color: transparent;
+      padding-bottom: inherit;
+}
+
+
+/* codes for the side links */
+#links {
+      float: left;
+      width: 15%;
+      height: 600px;
+      display: grid;
+      background-color: rgba(50, 50, 200, 0.5);
+      border: 1px solid green;
+      grid-template-rows: 50px 50px 50px 50px 50px 50px;
+
+
+}
+
+.linkers {
+      border: 1px solid blue;
+      text-decoration: none;
+      color: green;
+      background-color: transparent;
+}
+
+
+
+iframe{
+  float: right;
+  width: 84.5%;
+  border-collapse: collapse;
+}
