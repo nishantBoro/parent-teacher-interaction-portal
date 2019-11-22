@@ -19,7 +19,8 @@
         <li><a href="/register">Register</a></li>
         {% if session['logged_in_as'] == 'Teacher' %}
             <li><a href="/dashboard-teacher">Dashboard</a></li>
-        {% else if session['logged_in_as'] == 'Parent' %}
+        {% endif %}
+        {% if session['logged_in_as'] == 'Parent' %}
             <li><a href="/dashboard-parent">Dashboard</a></li>
         {% endif %}
     </ul>

@@ -35,6 +35,22 @@ def dashboardTeacher():
 def dashboardParent():
     return render_template('parent_dashboard.html')
 
+@app.route('/dashboard-parent-marks')
+def dashboardParentMarks():
+    usn = session.get("parent_student_usn", None)
+    cursor = mysql.connection.cursor()
+    cursor.execute('SELECT * FROM MARKS WHERE S_USN = %s AND S_SUBJECT_ID IN (SELECT SUBJECT_ID FROM SUBJECT)', (usn,))
+    marks = cursor.fetchall()
+    return render_template('parent_dashboard_marks.html', marks=marks)
+
+@app.route('/dashboard-parent-attendance')
+def dashboardParentAttendance():
+    usn = session.get("parent_student_usn", None)
+    cursor = mysql.connection.cursor()
+    cursor.execute('SELECT * FROM ATTENDANCE WHERE S_USN = %s AND S_SUBJECT_ID IN (SELECT SUBJECT_ID FROM SUBJECT)', (usn,))
+    attendance = cursor.fetchall()
+    return render_template('parent_dashboard_attendance.html',attendance=attendance)
+
 @app.route('/registration-teacher', methods=['GET','POST'])
 def registrationTeacher():
     if request.method == 'POST':
@@ -105,7 +121,7 @@ def loginParent():
             password = request.form['password']
             # Check if account exists using MySQL
             cursor = mysql.connection.cursor()
-            cursor.execute('SELECT * FROM TEACHER WHERE T_EMAIL = %s AND T_PASSWORD = %s', (email, password))
+            cursor.execute('SELECT * FROM PARENT WHERE EMAIL = %s AND P_PASSWORD = %s', (email, password))
             # Fetch one record and return result
             account = cursor.fetchone()
             # If account exists in accounts table in out database
@@ -113,6 +129,7 @@ def loginParent():
                 # Create session data, we can access this data in other routes
                 session['logged_in'] = True
                 session['logged_in_as'] = 'Parent'
+                session['parent_student_usn'] = account[5]
                 # Redirect to home page
                 return redirect('/')
             else:
@@ -125,12 +142,10 @@ def loginParent():
 def logout():
    # Remove session data, this will log the user out
    session['logged_in'] = False
-   session['logged_in_as'] =
+   session['logged_in_as'] = None
    # Redirect to home
    return redirect('/')
 
-
-/dashboard_teacher
 # @app.route('/users')
 # def users():
 #     cur = mysql.connection.cursor()

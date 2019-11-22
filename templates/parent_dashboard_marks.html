@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Parent Dashboard</title>
+</head>
+<body>
+
+    <div id="navbar">
+        <ul>
+            <li><a href="/">Home</a></li>
+            {% if session['logged_in'] %}
+            <li><a href="/logout">Logout</a></li>
+            {% else %}
+            <li><a href="/login">Login</a></li>
+            {% endif %}
+            <li><a href="/register">Register</a></li>
+            {% if session['logged_in_as'] == 'Teacher' %}
+            <li><a href="/dashboard-teacher">Dashboard</a></li>
+            {% endif %}
+            {% if session['logged_in_as'] == 'Parent' %}
+            <li><a href="/dashboard-parent">Dashboard</a></li>
+            {% endif %}
+        </ul>
+    </div>
+
+
+    <!-- codes for the link made at the right side -->
+
+    <div class="grid-container">
+        <aside class="sidenav">
+            <ul class="sidenav__list">
+                <li class="sidenav__list-item" id="dashboard">Dashboard</li>
+                <li class="sidenav__list-item"  id="marks">Marks</li>
+                <li class="sidenav__list-item"  id="attendance">Attendance</li>
+            </ul>
+        </aside>
+
+        <div class="w3-container" >
+            <h2>Student Name:</h2>
+            <br>
+            <table class="w3-table-all w3-card-4">
+                <tr>
+                    <th>Course Name</th>
+                    <th>CIA-1(10 marks)</th>
+                    <th>CIA-2(10 marks)</th>
+                    <th>CIA-3(10 marks)</th>
+                    <th>Assignment(10 marks)</th>
+                    <th>AAT(10 marks)</th>
+                    <th>SEE(50 marks)</th>
+                </tr>
+
+                {% for (usn, subj_id, cia1, cia2, cia3, assignment, aat, see) in marks %}
+                    <tr>
+                        <td>{{ subj_id }}</td>
+                        <td>{{ cia1 }}</td>
+                        <td>{{ cia2 }}</td>
+                        <td>{{ cia3 }}</td>
+                        <td>{{ assignment }}</td>
+                        <td>{{ aat }}</td>
+                        <td>{{ see }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+</body>
+
+<script>
+    document.getElementById("dashboard").addEventListener("click",function(e) {
+        if(e.target) {
+            window.location='/dashboard-parent'
+        }
+    });
+    document.getElementById("marks").addEventListener("click",function(e) {
+        if(e.target) {
+            window.location='/dashboard-parent-marks'
+        }
+    });
+    document.getElementById("attendance").addEventListener("click",function(e) {
+        if(e.target) {
+            window.location='/dashboard-parent-attendance'
+        }
+    });
+</script>
+<style>
+    @import url("https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800&display=swap" rel="stylesheet");
+
+    body {
+        margin: 0;
+        padding: 0;
+        color:#333030;
+        font-family: "Open Sans", Helvetica, sans-serif;
+        box-sizing: border-box;
+    }
+
+    #navbar ul {
+        margin: 0;
+        padding: 15px;
+        list-style-type: none;
+        text-align: center;
+        background-color: #000;
+    }
+
+    #navbar ul li {
+        display: inline;
+    }
+
+    #navbar ul li a {
+        text-decoration: none;
+        padding: .2em 1em;
+        color: #fff;
+        background-color: #000;
+        font-size: 20px;
+    }
+
+    #navbar ul li a:hover {
+        color: #000;
+        background-color: #fff;
+    }
+
+
+    .grid-container {
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: 50px 1fr 50px;
+        grid-template-areas: "header" "main" "footer";
+        height: 100vh;
+    }
+
+
+    .sidenav {
+        grid-area: sidenav;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        width: 240px;
+        position: fixed;
+        overflow-y: auto;
+        transform: translateX(-245px);
+        transition: all 0.6s ease-in-out;
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.08);
+        z-index: 2;
+        background-color: #394263;
+    }
+    .sidenav.active {
+        transform: translateX(0);
+    }
+
+    .sidenav__close-icon {
+        position: absolute;
+        visibility: visible;
+        top: 8px;
+        right: 12px;
+        cursor: pointer;
+        font-size: 20px;
+        color: #ddd;
+    }
+
+    .sidenav__list {
+        padding: 0;
+        margin-top: 85px;
+        list-style-type: none;
+    }
+
+    .sidenav__list-item {
+        padding: 20px 20px 20px 40px;
+        color: #ddd;
+    }
+    .sidenav__list-item:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+        cursor: pointer;
+    }
+
+    @media only screen and (min-width: 46.875em) {
+        /* Show the sidenav */
+        .grid-container {
+            grid-template-columns: 240px 1fr;
+            grid-template-areas: "sidenav header" "sidenav main" "sidenav footer";
+        }
+
+        .sidenav {
+            position: relative;
+            transform: translateX(0);
+        }
+
+        .sidenav__close-icon {
+            visibility: hidden;
+        }
+    }
+
+    @media only screen and (min-width: 65.625em) {
+
+        .w3-container {
+            padding:0.01em 16px
+        }
+
+        .w3-container:after,.w3-container:before {
+            content:"";display:table;clear:both
+        }
+
+        .w3-table-all{
+            border-collapse:collapse;
+            border-spacing:0;
+            width:100%;
+            display:table;
+            border:1px solid #ccc
+        }
+
+        .w3-table-all tr {
+            border-bottom:1px solid #ddd
+        }
+
+        .w3-table-all tr:nth-child(odd) {
+            background-color:#fff
+        }
+
+        .w3-table-all tr:nth-child(even) {
+            background-color:#f1f1f1
+        }
+
+        .w3-table-all td,.w3-table-all th {
+            padding:8px 8px;
+            display:table-cell;
+            text-align:left;
+            vertical-align:top
+        }
+
+        .w3-table-all th:first-child,.w3-table-all td:first-child {
+            padding-left:16px
+        }
+
+        .w3-card-4{
+            box-shadow:0 4px 10px 0 rgba(0,0,0,0.2),0 4px 20px 0 rgba(0,0,0,0.19)
+        }
+    }
+</style>
+</html>
