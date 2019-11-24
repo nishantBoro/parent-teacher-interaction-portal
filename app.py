@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session, flash, url_for
+from flask import Flask, render_template, request, redirect, session, flash, url_for, abort
 from flask_mysqldb import MySQL
 import yaml
 
@@ -23,11 +23,17 @@ def index():
 
 @app.route('/register')
 def register():
+    if session['logged_in'] is True:
+        flash("Action not allowed")
+        return redirect(url_for('index'))
     return render_template('registration.html')
 
 
 @app.route('/login')
 def login():
+    if session['logged_in'] is True:
+        flash("You are already logged in")
+        return redirect(url_for('index'))
     return render_template('login.html')
 
 
@@ -72,6 +78,11 @@ def get_marks(selected_student_usn):
 
 @app.route('/teacher-interacts', methods=['GET', 'POST'])
 def teacher_interacts():
+    if session['logged_in'] is not True or session['logged_in_as'] != 'Teacher':
+        return abort(401)
+    data = request.form
+    if data['selected-student'] == '0':
+        return redirect('/teacher-selects-student')
     if request.method == 'POST' and request.form.get('cia1', 'null') != 'null':
         cursor = mysql.connection.cursor()
         cursor.execute('SELECT * FROM SUBJECT')
@@ -105,10 +116,9 @@ def teacher_interacts():
             cursor.execute('UPDATE ATTENDANCE SET ATTENDANCE = %s WHERE S_USN = %s AND S_SUBJECT_ID = %s',
                            (attendance, selected_student_usn, subj[0]))
             mysql.connection.commit()
-        flash('Student data updated successfully!')
         cursor.close()
+        flash('Student data updated successfully!')
         return redirect('/teacher-selects-student')
-    data = request.form
     selected_student_usn = data['selected-student']
     my_tuple = get_marks(selected_student_usn)
     my_tuple_attendance = get_attendance(selected_student_usn)
@@ -122,6 +132,8 @@ def teacher_interacts():
 
 @app.route('/teacher-selects-student', methods=['GET', 'POST'])
 def teacher_selects_student():
+    if session['logged_in'] is not True or session['logged_in_as'] != 'Teacher':
+        return abort(401)
     cursor = mysql.connection.cursor()
     cursor.execute('SELECT USN, NAME FROM STUDENT')
     students = cursor.fetchall()
@@ -131,11 +143,15 @@ def teacher_selects_student():
 
 @app.route('/dashboard-parent')
 def dashboard_parent():
+    if session['logged_in'] is not True or session['logged_in_as'] != 'Parent':
+        return abort(401)
     return render_template('parent_dashboard.html')
 
 
 @app.route('/dashboard-parent-marks')
 def dashboard_parent_marks():
+    if session['logged_in'] is not True or session['logged_in_as'] != 'Parent':
+        return abort(401)
     usn = session.get("parent_student_usn", None)
     my_tuple = get_marks(usn)
     final_marks = my_tuple[0]
@@ -145,6 +161,8 @@ def dashboard_parent_marks():
 
 @app.route('/dashboard-parent-attendance')
 def dashboard_parent_attendance():
+    if session['logged_in'] is not True or session['logged_in_as'] != 'Parent':
+        return abort(401)
     usn = session.get("parent_student_usn", None)
     cursor = mysql.connection.cursor()
     cursor.execute('SELECT NAME FROM STUDENT WHERE USN = %s', (usn,))
@@ -163,6 +181,9 @@ def dashboard_parent_attendance():
 
 @app.route('/registration-teacher', methods=['GET', 'POST'])
 def registration_teacher():
+    if session['logged_in'] is True:
+        flash("Action not allowed")
+        return redirect(url_for('index'))
     if request.method == 'POST':
         # Fetch form data
         teacher_details = request.form
@@ -179,6 +200,9 @@ def registration_teacher():
 
 @app.route('/registration-parent', methods=['GET', 'POST'])
 def registration_parent():
+    if session['logged_in'] is True:
+        flash("Action not allowed")
+        return redirect(url_for('index'))
     cursor = mysql.connection.cursor()
     if request.method == 'POST':
         # Fetch form data
@@ -188,10 +212,9 @@ def registration_parent():
         email = parent_details['email']
         password = parent_details['password']
         student = parent_details['selected-student']
-        print(type(phone_number))
-        print(type(email))
-        print(type(password))
-        print(type(student))
+        if student == '0':
+            flash("Invalid details provided")
+            return redirect('/registration-parent')
         cursor.execute("INSERT INTO PARENT(P_NAME, PHONE, EMAIL, P_PASSWORD, S_PICKED_USN) VALUES(%s, %s, %s, %s, %s)",
                        (name, phone_number, email, password, student))
         mysql.connection.commit()
@@ -207,6 +230,9 @@ def registration_parent():
 
 @app.route('/login-teacher', methods=['GET', 'POST'])
 def login_teacher():
+    if session['logged_in'] is True:
+        flash("You are already logged in")
+        return redirect(url_for('index'))
     # Output message if something goes wrong...
     msg = ''
     # Check if "username" and "password" POST requests exist (user submitted form)
@@ -236,36 +262,42 @@ def login_teacher():
 
 @app.route('/login-parent', methods=['GET', 'POST'])
 def login_parent():
+    if session['logged_in'] is True:
+        flash("You are already logged in")
+        return redirect(url_for('index'))
     # Output message if something goes wrong...
-        msg = ''
-        # Check if "username" and "password" POST requests exist (user submitted form)
-        if request.method == 'POST' and 'email' in request.form and 'password' in request.form:
-            # Create variables for easy access
-            email = request.form['email']
-            password = request.form['password']
-            # Check if account exists using MySQL
-            cursor = mysql.connection.cursor()
-            cursor.execute('SELECT * FROM PARENT WHERE EMAIL = %s AND P_PASSWORD = %s', (email, password))
-            # Fetch one record and return result
-            account = cursor.fetchone()
-            cursor.close()
-            # If account exists in accounts table in out database
-            if account:
-                # Create session data, we can access this data in other routes
-                session['logged_in'] = True
-                session['logged_in_as'] = 'Parent'
-                session['parent_student_usn'] = account[5]
-                # Redirect to home page
-                return redirect('/')
-            else:
-                # Account doesnt exist or username/password incorrect
-                msg = 'Incorrect username/password!'
-        # Show the login form with message (if any)
-        return render_template('login_parent.html', msg=msg)
+    msg = ''
+    # Check if "username" and "password" POST requests exist (user submitted form)
+    if request.method == 'POST' and 'email' in request.form and 'password' in request.form:
+        # Create variables for easy access
+        email = request.form['email']
+        password = request.form['password']
+        # Check if account exists using MySQL
+        cursor = mysql.connection.cursor()
+        cursor.execute('SELECT * FROM PARENT WHERE EMAIL = %s AND P_PASSWORD = %s', (email, password))
+        # Fetch one record and return result
+        account = cursor.fetchone()
+        cursor.close()
+        # If account exists in accounts table in out database
+        if account:
+            # Create session data, we can access this data in other routes
+            session['logged_in'] = True
+            print(session['logged_in'])
+            session['logged_in_as'] = 'Parent'
+            session['parent_student_usn'] = account[5]
+            # Redirect to home page
+            return redirect('/')
+        else:
+            # Account doesnt exist or username/password incorrect
+            msg = 'Incorrect username/password!'
+    # Show the login form with message (if any)
+    return render_template('login_parent.html', msg=msg)
 
 
 @app.route('/logout')
 def logout():
+    if session['logged_in'] is not True and (session['logged_in_as'] != 'Parent' or session['logged_in_as'] != 'Teacher'):
+        return abort(401)
     session['logged_in'] = False
     session['logged_in_as'] = None
     return redirect('/')

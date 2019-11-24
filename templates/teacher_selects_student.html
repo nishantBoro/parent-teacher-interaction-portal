@@ -5,26 +5,16 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800&display=swap">
-    <title>Teacher's Dashboard</title>
+    <link rel="stylesheet" type="text/css" href="/static/styles/css/font_google.css">
+    <title>Select Student</title>
 </head>
 <body>
 
     <div id="navbar">
         <ul>
             <li><a href="/">Home</a></li>
-            {% if session['logged_in'] %}
             <li><a href="/logout">Logout</a></li>
-            {% else %}
-            <li><a href="/login">Login</a></li>
-            {% endif %}
-            <li><a href="/register">Register</a></li>
-            {% if session['logged_in_as'] == 'Teacher' %}
-            <li><a href="/dashboard-teacher">Dashboard</a></li>
-            {% endif %}
-            {% if session['logged_in_as'] == 'Parent' %}
-            <li><a href="/dashboard-parent">Dashboard</a></li>
-            {% endif %}
+            <li><a href="/teacher-selects-student">Interact</a></li>
         </ul>
     </div>
 
@@ -40,19 +30,16 @@
 
     <form id="my-form" method="post" action="/teacher-interacts">
 
-
-        <div class="grid-container">
-            <div class="w3-container">
-                <h2>Select student: </h2>
-                <br>
-                <div class="custom-select" style="width:200px;">
-                  <select name="selected-student">
-                      <option value="0">-</option>
-                      {% for (usn, name) in students %}
-                        <option value="{{ usn }}">{{ usn }} - {{ name }}</option>
-                      {% endfor %}
-                  </select>
-                </div>
+        <div class="w3-container">
+            <h2>Select student: </h2>
+            <br>
+            <div class="custom-select" style="width:500px;">
+              <select name="selected-student">
+                  <option value="0">-</option>
+                  {% for (usn, name) in students %}
+                    <option value="{{ usn }}">{{ usn }} - {{ name }}</option>
+                  {% endfor %}
+              </select>
             </div>
         </div>
     </form>
@@ -173,17 +160,11 @@
         background-color: #fff;
     }
 
-    .grid-container {
-        position: relative;
-        display: grid;
-        grid-template-columns: 1fr;
-        grid-template-rows: 50px 1fr 50px;
-        grid-template-areas: "header" "main" "footer";
-        height: 94vh;
-    }
-
     .custom-select {
       position: relative;
+      width: 100%;
+      margin: auto;
+      padding: 0;
       font-family: Arial;
     }
 
@@ -242,59 +223,31 @@
     }
 
 
-    @media only screen and (min-width: 46.875em) {
-        /* Show the sidenav */
-        .grid-container {
-
-            grid-template-columns: 240px 1fr;
-            grid-template-areas: "sidenav header" "sidenav main" "sidenav footer";
-        }
-    }
-
     @media only screen and (min-width: 65.625em) {
 
         .w3-container {
-            padding:0.01em 16px
+            padding:0.01em 16px;
+            text-align: center;
+            justify-content: center;
+            margin-top: 3%;
         }
 
         .w3-container:after,.w3-container:before {
-            content:"";display:table;clear:both
-        }
-
-        .w3-table-all{
-            border-collapse:collapse;
-            border-spacing:0;
-            width:100%;
+            content:"";
             display:table;
-            border:1px solid #ccc
+            clear:both;
         }
 
-        .w3-table-all tr {
-            border-bottom:1px solid #ddd
-        }
+    }
 
-        .w3-table-all tr:nth-child(odd) {
-            background-color:#fff
-        }
-
-        .w3-table-all tr:nth-child(even) {
-            background-color:#f1f1f1
-        }
-
-        .w3-table-all td,.w3-table-all th {
-            padding:8px 8px;
-            display:table-cell;
-            text-align:left;
-            vertical-align:top
-        }
-
-        .w3-table-all th:first-child,.w3-table-all td:first-child {
-            padding-left:16px
-        }
-
-        .w3-card-4{
-            box-shadow:0 4px 10px 0 rgba(0,0,0,0.2),0 4px 20px 0 rgba(0,0,0,0.19)
-        }
+    .flashes {
+        padding: 20px;
+        background-color: #f44336;
+        color: white;
+        font-size: larger;
+        list-style-type: none;
+        text-align: center;
+        margin-bottom: 15px;
     }
 </style>
 </html>

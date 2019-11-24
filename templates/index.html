@@ -5,35 +5,58 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" type="text/css" href="/static/styles/css/font_google.css">
     <title>Home</title>
 </head>
 <body>
-<div id="navbar">
-    <ul>
-        <li><a href="/">Home</a></li>
-        {% if session['logged_in'] %}
-            <li><a href="/logout">Logout</a></li>
-        {% else %}
-            <li><a href="/login">Login</a></li>
+    <div id="navbar">
+        <ul>
+            <li><a href="/">Home</a></li>
+            {% if session['logged_in'] %}
+                <li><a href="/logout">Logout</a></li>
+            {% else %}
+                <li><a href="/login">Login</a></li>
+                <li><a href="/register">Register</a></li>
+            {% endif %}
+            {% if session['logged_in_as'] == 'Teacher' %}
+                <li><a href="/teacher-selects-student">Interact</a></li>
+            {% endif %}
+            {% if session['logged_in_as'] == 'Parent' %}
+                <li><a href="/dashboard-parent">Dashboard</a></li>
+            {% endif %}
+        </ul>
+    </div>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul class=flashes>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
         {% endif %}
-        <li><a href="/register">Register</a></li>
-        {% if session['logged_in_as'] == 'Teacher' %}
-            <li><a href="/teacher-selects-student">Interact</a></li>
-        {% endif %}
-        {% if session['logged_in_as'] == 'Parent' %}
-            <li><a href="/dashboard-parent">Dashboard</a></li>
-        {% endif %}
-    </ul>
+    {% endwith %}
 
-    <img src="./images/home_page.png" alt="Parent Teacher Interaction Portal" width="200"
-         height="80">
-</div>
+    <img src="/static/styles/images/home_page.png" alt="Parent Teacher Interaction Portal" width="1000"
+         height="500">
 </body>
 
 <style>
     body {
         margin: 0;
         padding: 0;
+        color:#333030;
+        font-family: "Open Sans", Helvetica, sans-serif;
+        box-sizing: border-box;
+    }
+
+    .flashes {
+        padding: 20px;
+        background-color: #f44336;
+        color: white;
+        font-size: larger;
+        list-style-type: none;
+        text-align: center;
+        margin-bottom: 15px;
     }
 
     #navbar ul {
@@ -59,6 +82,13 @@
     #navbar ul li a:hover {
         color: #000;
         background-color: #fff;
+    }
+
+    img {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 0;
     }
 </style>
 </html>
