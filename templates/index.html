@@ -18,7 +18,7 @@
         {% endif %}
         <li><a href="/register">Register</a></li>
         {% if session['logged_in_as'] == 'Teacher' %}
-            <li><a href="/dashboard-teacher">Dashboard</a></li>
+            <li><a href="/teacher-selects-student">Interact</a></li>
         {% endif %}
         {% if session['logged_in_as'] == 'Parent' %}
             <li><a href="/dashboard-parent">Dashboard</a></li>

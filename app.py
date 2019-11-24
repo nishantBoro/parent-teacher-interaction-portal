@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session
+from flask import Flask, render_template, request, redirect, session, flash, url_for
 from flask_mysqldb import MySQL
 import yaml
 
@@ -15,76 +15,198 @@ app.config['MYSQL_DB'] = db['mysql_db']
 
 mysql = MySQL(app)
 
+
 @app.route('/')
 def index():
     return render_template('index.html')
+
 
 @app.route('/register')
 def register():
     return render_template('registration.html')
 
+
 @app.route('/login')
 def login():
     return render_template('login.html')
 
-@app.route('/dashboard-teacher')
-def dashboardTeacher():
-    return render_template('teacher_dashboard.html')
+
+# def init_default_marks(student_usn):
+#     cursor = mysql.connection.cursor()
+#     cursor.execute('SELECT ', (student_usn, ))
+
+
+def get_attendance(selected_student_usn):
+    cursor = mysql.connection.cursor()
+    cursor.execute('SELECT NAME FROM STUDENT WHERE USN = %s', (selected_student_usn,))
+    student_row = cursor.fetchone()
+    student_name = student_row[0]
+    cursor.execute('SELECT * FROM ATTENDANCE WHERE S_USN = %s AND S_SUBJECT_ID IN (SELECT SUBJECT_ID FROM SUBJECT)',
+                   (selected_student_usn,))
+    all_attendances = cursor.fetchall()
+    final_attendance = []
+    for (usn, subj_id, attendance) in all_attendances:
+        cursor.execute('SELECT SUBJECT_NAME FROM SUBJECT WHERE SUBJECT_ID = %s', (subj_id,))
+        subj_name = cursor.fetchone()
+        final_attendance.append((subj_name[0], attendance))
+    cursor.close()
+    return final_attendance, student_name
+
+
+def get_marks(selected_student_usn):
+    cursor = mysql.connection.cursor()
+    cursor.execute('SELECT NAME FROM STUDENT WHERE USN = %s', (selected_student_usn,))
+    student_row = cursor.fetchone()
+    student_name = student_row[0]
+    cursor.execute('SELECT * FROM MARKS WHERE S_USN = %s AND S_SUBJECT_ID IN (SELECT SUBJECT_ID FROM SUBJECT)',
+                   (selected_student_usn,))
+    marks = cursor.fetchall()
+    final_marks = []
+    for (usn, subj_id, cia1, cia2, cia3, assignment, aat, see) in marks:
+        cursor.execute('SELECT SUBJECT_NAME FROM SUBJECT WHERE SUBJECT_ID = %s', (subj_id,))
+        subj_name = cursor.fetchone()
+        final_marks.append((subj_name[0], cia1, cia2, cia3, assignment, aat, see))
+    cursor.close()
+    return final_marks, student_name
+
+
+@app.route('/teacher-interacts', methods=['GET', 'POST'])
+def teacher_interacts():
+    if request.method == 'POST' and request.form.get('cia1', 'null') != 'null':
+        cursor = mysql.connection.cursor()
+        cursor.execute('SELECT * FROM SUBJECT')
+        subj_list = cursor.fetchall()
+        new_marks = []
+        new_attendances = []
+        selected_student_usn = None
+        for idy, row in enumerate(request.form):
+            row_data = request.form.getlist(row)
+            print(row_data)
+            for idx, col in enumerate(row_data):
+                if idy == 0:
+                    new_marks.append([])
+                    new_attendances.append([])
+                if idy != len(request.form)-2:
+                    new_marks[idx].append(col)
+                else:
+                    new_attendances[idx].append(col)
+        for i in new_attendances:
+            print(i)
+        for idx, subj in enumerate(subj_list):
+            if len(new_marks[idx]) == 6:
+                cia1, cia2, cia3, assignment, aat, see = new_marks[idx]
+            elif len(new_marks[idx]) == 7:
+                cia1, cia2, cia3, assignment, aat, see, selected_student_usn = new_marks[idx]
+            cursor.execute('UPDATE MARKS SET CIA1 = %s, CIA2 = %s, CIA3 = %s, ASSIGNMENT = %s, AAT = %s, SEE = %s '
+                           'WHERE S_USN = %s AND S_SUBJECT_ID = %s', (cia1, cia2, cia3, assignment, aat, see,
+                                                                      selected_student_usn, subj[0]))
+            mysql.connection.commit()
+            attendance = new_attendances[idx]
+            cursor.execute('UPDATE ATTENDANCE SET ATTENDANCE = %s WHERE S_USN = %s AND S_SUBJECT_ID = %s',
+                           (attendance, selected_student_usn, subj[0]))
+            mysql.connection.commit()
+        flash('Student data updated successfully!')
+        cursor.close()
+        return redirect('/teacher-selects-student')
+    data = request.form
+    selected_student_usn = data['selected-student']
+    my_tuple = get_marks(selected_student_usn)
+    my_tuple_attendance = get_attendance(selected_student_usn)
+    current_marks = my_tuple[0]
+    student_name = my_tuple[1]
+    current_attendances = my_tuple_attendance[0]
+    return render_template('teacher_interacts.html', selected_student_usn=selected_student_usn,
+                           student_name=student_name, current_marks=current_marks,
+                           current_attendances=current_attendances)
+
+
+@app.route('/teacher-selects-student', methods=['GET', 'POST'])
+def teacher_selects_student():
+    cursor = mysql.connection.cursor()
+    cursor.execute('SELECT USN, NAME FROM STUDENT')
+    students = cursor.fetchall()
+    cursor.close()
+    return render_template('teacher_selects_student.html', students=students)
+
 
 @app.route('/dashboard-parent')
-def dashboardParent():
+def dashboard_parent():
     return render_template('parent_dashboard.html')
 
+
 @app.route('/dashboard-parent-marks')
-def dashboardParentMarks():
+def dashboard_parent_marks():
     usn = session.get("parent_student_usn", None)
-    cursor = mysql.connection.cursor()
-    cursor.execute('SELECT * FROM MARKS WHERE S_USN = %s AND S_SUBJECT_ID IN (SELECT SUBJECT_ID FROM SUBJECT)', (usn,))
-    marks = cursor.fetchall()
-    return render_template('parent_dashboard_marks.html', marks=marks)
+    my_tuple = get_marks(usn)
+    final_marks = my_tuple[0]
+    student_name = my_tuple[1]
+    return render_template('parent_dashboard_marks.html', final_marks=final_marks, student_name=student_name)
+
 
 @app.route('/dashboard-parent-attendance')
-def dashboardParentAttendance():
+def dashboard_parent_attendance():
     usn = session.get("parent_student_usn", None)
     cursor = mysql.connection.cursor()
+    cursor.execute('SELECT NAME FROM STUDENT WHERE USN = %s', (usn,))
+    student_row = cursor.fetchone()
+    student_name = student_row[0]
     cursor.execute('SELECT * FROM ATTENDANCE WHERE S_USN = %s AND S_SUBJECT_ID IN (SELECT SUBJECT_ID FROM SUBJECT)', (usn,))
     attendance = cursor.fetchall()
-    return render_template('parent_dashboard_attendance.html',attendance=attendance)
+    final_attendance = []
+    for (usn, subj_id, attendance) in attendance:
+        cursor.execute('SELECT SUBJECT_NAME FROM SUBJECT WHERE SUBJECT_ID = %s', (subj_id,))
+        subj_name = cursor.fetchone()
+        final_attendance.append((subj_name[0], attendance))
+    cursor.close()
+    return render_template('parent_dashboard_attendance.html', student_name=student_name, final_attendance=final_attendance)
 
-@app.route('/registration-teacher', methods=['GET','POST'])
-def registrationTeacher():
+
+@app.route('/registration-teacher', methods=['GET', 'POST'])
+def registration_teacher():
     if request.method == 'POST':
         # Fetch form data
-        teacherDetails = request.form
-        name = teacherDetails['name']
-        email = teacherDetails['email']
-        password = teacherDetails['password']
+        teacher_details = request.form
+        name = teacher_details['name']
+        email = teacher_details['email']
+        password = teacher_details['password']
         cur = mysql.connection.cursor()
-        cur.execute("INSERT INTO TEACHER(TEACHER_NAME, T_EMAIL, T_PASSWORD) VALUES(%s, %s, %s)",(name, email, password))
+        cur.execute("INSERT INTO TEACHER(TEACHER_NAME, T_EMAIL, T_PASSWORD) VALUES(%s, %s, %s)", (name, email, password))
         mysql.connection.commit()
         cur.close()
         return redirect('/')
     return render_template('registration_teacher.html')
 
-@app.route('/registration-parent', methods=['GET','POST'])
-def registrationParent():
+
+@app.route('/registration-parent', methods=['GET', 'POST'])
+def registration_parent():
+    cursor = mysql.connection.cursor()
     if request.method == 'POST':
         # Fetch form data
-        parentDetails = request.form
-        name = parentDetails['name']
-        phoneNumber = parentDetails['phone-number']
-        email = parentDetails['email']
-        password = parentDetails['password']
-        student = parentDetails['student-picked']
-        cur = mysql.connection.cursor()
-        cur.execute("INSERT INTO PARENT(P_NAME, PHONE, EMAIL, P_PASSWORD, S_PICKED_USN) VALUES(%s, %s, %s)",(name, phoneNumber, email, password, student))
+        parent_details = request.form
+        name = parent_details['name']
+        phone_number = parent_details['contact']
+        email = parent_details['email']
+        password = parent_details['password']
+        student = parent_details['selected-student']
+        print(type(phone_number))
+        print(type(email))
+        print(type(password))
+        print(type(student))
+        cursor.execute("INSERT INTO PARENT(P_NAME, PHONE, EMAIL, P_PASSWORD, S_PICKED_USN) VALUES(%s, %s, %s, %s, %s)",
+                       (name, phone_number, email, password, student))
         mysql.connection.commit()
-        cur.close()
+        cursor.execute('UPDATE STUDENT SET REGISTERED = TRUE WHERE USN = %s', (student,))
+        mysql.connection.commit()
+        cursor.close()
         return redirect('/')
-    return render_template('registration_parent.html')
+    cursor.execute('SELECT USN, NAME FROM STUDENT WHERE REGISTERED = FALSE')
+    students = cursor.fetchall()
+    print(students)
+    return render_template('registration_parent.html', students=students)
 
-@app.route('/login-teacher', methods=['GET','POST'])
-def loginTeacher():
+
+@app.route('/login-teacher', methods=['GET', 'POST'])
+def login_teacher():
     # Output message if something goes wrong...
     msg = ''
     # Check if "username" and "password" POST requests exist (user submitted form)
@@ -97,6 +219,7 @@ def loginTeacher():
         cursor.execute('SELECT * FROM TEACHER WHERE T_EMAIL = %s AND T_PASSWORD = %s', (email, password))
         # Fetch one record and return result
         account = cursor.fetchone()
+        cursor.close()
         # If account exists in accounts table in out database
         if account:
             # Create session data, we can access this data in other routes
@@ -110,8 +233,9 @@ def loginTeacher():
     # Show the login form with message (if any)
     return render_template('login_teacher.html', msg=msg)
 
-@app.route('/login-parent', methods=['GET','POST'])
-def loginParent():
+
+@app.route('/login-parent', methods=['GET', 'POST'])
+def login_parent():
     # Output message if something goes wrong...
         msg = ''
         # Check if "username" and "password" POST requests exist (user submitted form)
@@ -124,6 +248,7 @@ def loginParent():
             cursor.execute('SELECT * FROM PARENT WHERE EMAIL = %s AND P_PASSWORD = %s', (email, password))
             # Fetch one record and return result
             account = cursor.fetchone()
+            cursor.close()
             # If account exists in accounts table in out database
             if account:
                 # Create session data, we can access this data in other routes
@@ -138,13 +263,12 @@ def loginParent():
         # Show the login form with message (if any)
         return render_template('login_parent.html', msg=msg)
 
+
 @app.route('/logout')
 def logout():
-   # Remove session data, this will log the user out
-   session['logged_in'] = False
-   session['logged_in_as'] = None
-   # Redirect to home
-   return redirect('/')
+    session['logged_in'] = False
+    session['logged_in_as'] = None
+    return redirect('/')
 
 # @app.route('/users')
 # def users():
@@ -153,6 +277,7 @@ def logout():
 #     if resultValue > 0:
 #         userDetails = cur.fetchall()
 #         return render_template('users.html',userDetails=userDetails)
+
 
 if __name__ == '__main__':
     app.run(debug=True)

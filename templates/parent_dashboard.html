@@ -5,7 +5,7 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/css/parent-dashboard.css') }}">
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800&display=swap">
     <title>Parent Dashboard</title>
 </head>
 <body>
@@ -29,13 +29,13 @@
     </div>
 
     <div class="grid-container">
-        <aside class="sidenav">
+        <div class="sidenav">
             <ul class="sidenav__list">
                 <li class="sidenav__list-item" id="dashboard">Dashboard</li>
                 <li class="sidenav__list-item"  id="marks">Marks</li>
                 <li class="sidenav__list-item"  id="attendance">Attendance</li>
             </ul>
-        </aside>
+        </div>
         <main class="main">
             <div class="main-header">
                 <div class="main-header__heading">Message from the Teacher:</div>
@@ -62,9 +62,111 @@
     });
 </script>
 <style>
-    .main {
-        position: relative;
-        top: -5.8%;
+    body {
+        margin: 0;
+        padding: 0;
+        color:#333030;
+        font-family: "Open Sans", Helvetica, sans-serif;
+        box-sizing: border-box;
     }
+
+    #navbar ul {
+        margin: 0;
+        padding: 15px;
+        list-style-type: none;
+        text-align: center;
+        background-color: #000;
+    }
+
+    #navbar ul li {
+        display: inline;
+    }
+
+    #navbar ul li a {
+        text-decoration: none;
+        padding: .2em 1em;
+        color: #fff;
+        background-color: #000;
+        font-size: 20px;
+    }
+
+    #navbar ul li a:hover {
+        color: #000;
+        background-color: #fff;
+    }
+
+    .grid-container {
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: 50px 1fr 50px;
+        grid-template-areas: "header" "main" "footer";
+        height: 94vh;
+    }
+
+    .main {
+        grid-area: main;
+        background-color: #8fd4d9;
+        position: absolute;
+        top: 5.9%;
+        left: 12.5%;
+        width: 87.5%;
+    }
+
+    .main-header {
+        display: flex;
+        justify-content: space-between;
+        margin: 20px;
+        padding: 20px;
+        height: 150px;
+        background-color: #e3e4e6;
+        color: slategray;
+    }
+
+    .sidenav {
+        grid-area: sidenav;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        width: 240px;
+        position: fixed;
+        overflow-y: auto;
+        transform: translateX(-245px);
+        transition: all 0.6s ease-in-out;
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.08);
+        z-index: 2;
+        background-color: #394263;
+    }
+    .sidenav.active {
+        transform: translateX(0);
+    }
+
+    .sidenav__list {
+        padding: 0;
+        margin-top: 85px;
+        list-style-type: none;
+    }
+
+    .sidenav__list-item {
+        padding: 20px 20px 20px 40px;
+        color: #ddd;
+    }
+    .sidenav__list-item:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+        cursor: pointer;
+    }
+
+    @media only screen and (min-width: 46.875em) {
+        .grid-container {
+            grid-template-columns: 240px 1fr;
+            grid-template-areas: "sidenav header" "sidenav main" "sidenav footer";
+        }
+
+        .sidenav {
+            position: relative;
+            transform: translateX(0);
+        }
+
+    }
+
 </style>
 </html>

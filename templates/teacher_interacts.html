@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800&display=swap">
+    <title>Teacher's Dashboard</title>
+</head>
+<body>
+
+    <div id="navbar">
+        <ul>
+            <li><a href="/">Home</a></li>
+            {% if session['logged_in'] %}
+            <li><a href="/logout">Logout</a></li>
+            {% else %}
+            <li><a href="/login">Login</a></li>
+            {% endif %}
+            <li><a href="/register">Register</a></li>
+            {% if session['logged_in_as'] == 'Teacher' %}
+            <li><a href="/dashboard-teacher">Dashboard</a></li>
+            {% endif %}
+            {% if session['logged_in_as'] == 'Parent' %}
+            <li><a href="/dashboard-parent">Dashboard</a></li>
+            {% endif %}
+        </ul>
+    </div>
+
+    <div class="grid-container">
+        <div class="w3-container">
+            <h2>Student Name: {{ student_name }}</h2>
+            <br>
+            <h3>Marks:</h3>
+            <form method="post">
+                <table class="w3-table-all w3-card-4">
+                    <tr>
+                        <th>Course Name</th>
+                        <th>CIA-1(10 marks)</th>
+                        <th>CIA-2(10 marks)</th>
+                        <th>CIA-3(10 marks)</th>
+                        <th>Assignment(10 marks)</th>
+                        <th>AAT(10 marks)</th>
+                        <th>SEE(50 marks)</th>
+                    </tr>
+
+                    <tbody>
+                        {% for (subj_name, cia1, cia2, cia3, assignment, aat, see) in current_marks %}
+                            <tr>
+                                <td>{{ subj_name }}</td>
+                                <td><input type="text" name="cia1" value="{{ cia1 }}" /></td>
+                                <td><input type="text" name="cia2" value="{{ cia2 }}" /></td>
+                                <td><input type="text" name="cia3" value="{{ cia3 }}" /></td>
+                                <td><input type="text" name="assignment" value="{{ assignment }}" /></td>
+                                <td><input type="text" name="aat" value="{{ aat }}" /></td>
+                                <td><input type="text" name="see" value="{{ see }}" /></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <table class="w3-table-all w3-card-4">
+                    <tr>
+                        <th>Course Name</th>
+                        <th>Attendance</th>
+                    </tr>
+
+                    <tbody>
+                        {% for (subj_name, attendance) in current_attendances %}
+                            <tr>
+                                <td>{{ subj_name }}</td>
+                                <td><input type="text" name="attendance" value="{{ attendance }}" /></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <input class="submit-button" type="submit" value="Save and close">
+                <input type="hidden" name="selected-student" value="{{ selected_student_usn }}" />
+            </form>
+        </div>
+    </div>
+</body>
+<script>
+    function updateInput(td) {
+        console.log(td.firstChild)
+        let lastChild = td.lastChild;
+        td.firstChild['value'] = lastChild.textContent
+    }
+</script>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        color:#333030;
+        font-family: "Open Sans", Helvetica, sans-serif;
+        box-sizing: border-box;
+    }
+
+    #navbar ul {
+        margin: 0;
+        padding: 15px;
+        list-style-type: none;
+        text-align: center;
+        background-color: #000;
+    }
+
+    #navbar ul li {
+        display: inline;
+    }
+
+    #navbar ul li a {
+        text-decoration: none;
+        padding: .2em 1em;
+        color: #fff;
+        background-color: #000;
+        font-size: 20px;
+    }
+
+    #navbar ul li a:hover {
+        color: #000;
+        background-color: #fff;
+    }
+
+    .grid-container {
+        position: relative;
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: 50px 1fr 50px;
+        grid-template-areas: "header" "main" "footer";
+        height: 94vh;
+    }
+
+    .custom-select {
+      position: relative;
+      font-family: Arial;
+    }
+
+    .custom-select select {
+      display: none; /*hide original SELECT element: */
+    }
+
+    .select-selected {
+      background-color: DodgerBlue;
+    }
+
+    /* Style the arrow inside the select element: */
+    .select-selected:after {
+      position: absolute;
+      content: "";
+      top: 14px;
+      right: 10px;
+      width: 0;
+      height: 0;
+      border: 6px solid;
+      border-color: #fff transparent transparent transparent;
+    }
+
+    /* Point the arrow upwards when the select box is open (active): */
+    .select-selected.select-arrow-active:after {
+      border-color: transparent transparent #fff transparent;
+      top: 7px;
+    }
+
+    /* style the items (options), including the selected item: */
+    .select-items div,.select-selected {
+      color: #ffffff;
+      padding: 8px 16px;
+      border: 1px solid;
+      border-color: transparent transparent rgba(0, 0, 0, 0.1) transparent;
+      cursor: pointer;
+    }
+
+    /* Style items (options): */
+    .select-items {
+      position: absolute;
+      background-color: DodgerBlue;
+      top: 100%;
+      left: 0;
+      right: 0;
+      z-index: 99;
+    }
+
+    /* Hide the items when the select box is closed: */
+    .select-hide {
+      display: none;
+    }
+
+    .select-items div:hover, .same-as-selected {
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+
+
+    @media only screen and (min-width: 46.875em) {
+        /* Show the sidenav */
+        .grid-container {
+
+            grid-template-columns: 240px 1fr;
+            grid-template-areas: "sidenav header" "sidenav main" "sidenav footer";
+        }
+    }
+
+    @media only screen and (min-width: 65.625em) {
+
+        .w3-container {
+            padding:0.01em 16px
+        }
+
+        .w3-container:after,.w3-container:before {
+            content:"";display:table;clear:both
+        }
+
+        .w3-table-all{
+            border-collapse:collapse;
+            border-spacing:0;
+            width:100%;
+            display:table;
+            border:1px solid #ccc
+        }
+
+        .w3-table-all tr {
+            border-bottom:1px solid #ddd
+        }
+
+        .w3-table-all tr:nth-child(odd) {
+            background-color:#fff
+        }
+
+        .w3-table-all tr:nth-child(even) {
+            background-color:#f1f1f1
+        }
+
+        .w3-table-all td,.w3-table-all th {
+            padding:8px 8px;
+            display:table-cell;
+            text-align:left;
+            vertical-align:top
+        }
+
+        .w3-table-all th:first-child,.w3-table-all td:first-child {
+            padding-left:16px
+        }
+
+        .w3-card-4{
+            box-shadow:0 4px 10px 0 rgba(0,0,0,0.2),0 4px 20px 0 rgba(0,0,0,0.19)
+        }
+    }
+
+    .submit-button {
+        background: gray;
+        color: #fff;
+        border: 1px solid #eee;
+        border-radius: 2px;
+        box-shadow: 5px 5px 5px #eee;
+        text-shadow:none;
+        padding: 10px;
+        font-size: 20px;
+    }
+
+    .submit-button:hover {
+        background: darkgray;
+        color: #fff;
+        border: 1px solid #eee;
+        border-radius: 2px;
+        box-shadow: 5px 5px 5px #eee;
+        text-shadow:none;
+    }
+</style>
+</html>

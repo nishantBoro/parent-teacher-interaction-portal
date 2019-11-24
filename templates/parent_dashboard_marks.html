@@ -5,6 +5,7 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800&display=swap">
     <title>Parent Dashboard</title>
 </head>
 <body>
@@ -40,7 +41,7 @@
         </aside>
 
         <div class="w3-container" >
-            <h2>Student Name:</h2>
+            <h2>Student Name: {{ studentName }}</h2>
             <br>
             <table class="w3-table-all w3-card-4">
                 <tr>
@@ -53,9 +54,9 @@
                     <th>SEE(50 marks)</th>
                 </tr>
 
-                {% for (usn, subj_id, cia1, cia2, cia3, assignment, aat, see) in marks %}
+                {% for (subj_name, cia1, cia2, cia3, assignment, aat, see) in final_marks %}
                     <tr>
-                        <td>{{ subj_id }}</td>
+                        <td>{{ subj_name }}</td>
                         <td>{{ cia1 }}</td>
                         <td>{{ cia2 }}</td>
                         <td>{{ cia3 }}</td>
@@ -87,8 +88,6 @@
     });
 </script>
 <style>
-    @import url("https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800&display=swap" rel="stylesheet");
-
     body {
         margin: 0;
         padding: 0;
@@ -128,7 +127,7 @@
         grid-template-columns: 1fr;
         grid-template-rows: 50px 1fr 50px;
         grid-template-areas: "header" "main" "footer";
-        height: 100vh;
+        height: 94vh;
     }
 
 

@@ -5,48 +5,62 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="../css/styles.css">
-    <title>Registration</title>
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800&display=swap">
+    <title>Teacher's Dashboard</title>
 </head>
 <body>
+
     <div id="navbar">
         <ul>
-            <li><a href="./index.html">Home</a></li>
-            <li><a href="./login.html">Login</a></li>
-            <li><a href="./registration.html">Register</a></li>
+            <li><a href="/">Home</a></li>
+            {% if session['logged_in'] %}
+            <li><a href="/logout">Logout</a></li>
+            {% else %}
+            <li><a href="/login">Login</a></li>
+            {% endif %}
+            <li><a href="/register">Register</a></li>
+            {% if session['logged_in_as'] == 'Teacher' %}
+            <li><a href="/dashboard-teacher">Dashboard</a></li>
+            {% endif %}
+            {% if session['logged_in_as'] == 'Parent' %}
+            <li><a href="/dashboard-parent">Dashboard</a></li>
+            {% endif %}
         </ul>
     </div>
 
-    <div id="info">
-        <form method="post">
-            <label for="name">Name</label>
-            <input class="input-text" type="text" id="name" name="name" placeholder="Your name..">
+    {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul class=flashes>
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+    {% endwith %}
 
-            <label for="contact">Phone Number</label>
-            <input class="input-text" type="text" id="contact" name="contact" placeholder="Your name..">
+    <form id="my-form" method="post" action="/teacher-interacts">
 
-            <label for="email">Email Address</label>
-            <input class="input-text" type="text" id="email" name="email" placeholder="Your name..">
 
-            <label for="password">Password</label>
-            <input class="input-text" type="password" id="password" name="password" placeholder="Your name..">
-
-            <label for="select"></label>
-            <div class="custom-select" style="width:200px;">
-                  <select name="selected-student" id="select">
+        <div class="grid-container">
+            <div class="w3-container">
+                <h2>Select student: </h2>
+                <br>
+                <div class="custom-select" style="width:200px;">
+                  <select name="selected-student">
                       <option value="0">-</option>
                       {% for (usn, name) in students %}
                         <option value="{{ usn }}">{{ usn }} - {{ name }}</option>
                       {% endfor %}
                   </select>
                 </div>
+            </div>
+        </div>
+    </form>
 
-            <input class="submit-button" type="submit" value="Submit">
-        </form>
-    </div>
 </body>
+
 <script>
-    var x, i, j, selElmnt, a, b, c;
+    var x, i, j, selElmnt, a, b, c, ignore = true;
     /* Look for any elements with the class "custom-select": */
     x = document.getElementsByClassName("custom-select");
     for (i = 0; i < x.length; i++) {
@@ -94,6 +108,10 @@
         closeAllSelect(this);
         this.nextSibling.classList.toggle("select-hide");
         this.classList.toggle("select-arrow-active");
+        if(!ignore) {
+            document.getElementById('my-form').submit();
+        }
+        ignore = false;
       });
     }
 
@@ -125,6 +143,9 @@
     body {
         margin: 0;
         padding: 0;
+        color:#333030;
+        font-family: "Open Sans", Helvetica, sans-serif;
+        box-sizing: border-box;
     }
 
     #navbar ul {
@@ -152,41 +173,13 @@
         background-color: #fff;
     }
 
-    .submit-button {
-        background: gray;
-        color: #fff;
-        border: 1px solid #eee;
-        border-radius: 2px;
-        box-shadow: 5px 5px 5px #eee;
-        text-shadow:none;
-        padding: 10px;
-        font-size: 20px;
-    }
-
-    .submit-button:hover {
-        background: darkgray;
-        color: #fff;
-        border: 1px solid #eee;
-        border-radius: 2px;
-        box-shadow: 5px 5px 5px #eee;
-        text-shadow:none;
-    }
-
-    .input-text {
-        width: 100%;
-        padding: 12px 20px;
-        margin: 8px 0;
-        display: inline-block;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        box-sizing: border-box;
-    }
-
-    #info {
-        padding: 0;
-        margin: 50px auto;
-
-        width: 50%;
+    .grid-container {
+        position: relative;
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: 50px 1fr 50px;
+        grid-template-areas: "header" "main" "footer";
+        height: 94vh;
     }
 
     .custom-select {
@@ -247,6 +240,61 @@
     .select-items div:hover, .same-as-selected {
       background-color: rgba(0, 0, 0, 0.1);
     }
-</style>
 
+
+    @media only screen and (min-width: 46.875em) {
+        /* Show the sidenav */
+        .grid-container {
+
+            grid-template-columns: 240px 1fr;
+            grid-template-areas: "sidenav header" "sidenav main" "sidenav footer";
+        }
+    }
+
+    @media only screen and (min-width: 65.625em) {
+
+        .w3-container {
+            padding:0.01em 16px
+        }
+
+        .w3-container:after,.w3-container:before {
+            content:"";display:table;clear:both
+        }
+
+        .w3-table-all{
+            border-collapse:collapse;
+            border-spacing:0;
+            width:100%;
+            display:table;
+            border:1px solid #ccc
+        }
+
+        .w3-table-all tr {
+            border-bottom:1px solid #ddd
+        }
+
+        .w3-table-all tr:nth-child(odd) {
+            background-color:#fff
+        }
+
+        .w3-table-all tr:nth-child(even) {
+            background-color:#f1f1f1
+        }
+
+        .w3-table-all td,.w3-table-all th {
+            padding:8px 8px;
+            display:table-cell;
+            text-align:left;
+            vertical-align:top
+        }
+
+        .w3-table-all th:first-child,.w3-table-all td:first-child {
+            padding-left:16px
+        }
+
+        .w3-card-4{
+            box-shadow:0 4px 10px 0 rgba(0,0,0,0.2),0 4px 20px 0 rgba(0,0,0,0.19)
+        }
+    }
+</style>
 </html>
