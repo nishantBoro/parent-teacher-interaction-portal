@@ -15,7 +15,6 @@ app.config['MYSQL_DB'] = db['mysql_db']
 
 mysql = MySQL(app)
 
-
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -23,7 +22,7 @@ def index():
 
 @app.route('/register')
 def register():
-    if session['logged_in'] is True:
+    if session.__contains__('logged_in') and session['logged_in'] is True:
         flash("Action not allowed")
         return redirect(url_for('index'))
     return render_template('registration.html')
@@ -31,7 +30,7 @@ def register():
 
 @app.route('/login')
 def login():
-    if session['logged_in'] is True:
+    if session.__contains__('logged_in') and session['logged_in'] is True:
         flash("You are already logged in")
         return redirect(url_for('index'))
     return render_template('login.html')
@@ -181,7 +180,7 @@ def dashboard_parent_attendance():
 
 @app.route('/registration-teacher', methods=['GET', 'POST'])
 def registration_teacher():
-    if session['logged_in'] is True:
+    if session.__contains__('logged_in') and session['logged_in'] is True:
         flash("Action not allowed")
         return redirect(url_for('index'))
     if request.method == 'POST':
@@ -200,7 +199,7 @@ def registration_teacher():
 
 @app.route('/registration-parent', methods=['GET', 'POST'])
 def registration_parent():
-    if session['logged_in'] is True:
+    if session.__contains__('logged_in') and session['logged_in'] is True:
         flash("Action not allowed")
         return redirect(url_for('index'))
     cursor = mysql.connection.cursor()
@@ -230,7 +229,7 @@ def registration_parent():
 
 @app.route('/login-teacher', methods=['GET', 'POST'])
 def login_teacher():
-    if session['logged_in'] is True:
+    if session.__contains__('logged_in') and session['logged_in'] is True:
         flash("You are already logged in")
         return redirect(url_for('index'))
     # Output message if something goes wrong...
@@ -262,7 +261,7 @@ def login_teacher():
 
 @app.route('/login-parent', methods=['GET', 'POST'])
 def login_parent():
-    if session['logged_in'] is True:
+    if session.__contains__('logged_in') and session['logged_in'] is True:
         flash("You are already logged in")
         return redirect(url_for('index'))
     # Output message if something goes wrong...

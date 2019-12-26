@@ -1,5 +1,5 @@
+// Enter your database details here
 mysql_host: 'localhost'
-mysql_user: 'nishant'
-# Enter your password in field below
+mysql_user: 'user-name'
 mysql_password: 'password'
-mysql_db: 'MYDATABASE'
+mysql_db: 'db-name'
