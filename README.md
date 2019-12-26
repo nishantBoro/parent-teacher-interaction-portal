@@ -8,7 +8,8 @@ Teacher's Dashboard while updating a student:<img src="https://github.com/nishan
 
 Student Dashboard:<img src="https://github.com/nishant-boro/parent-teacher-interaction-portal/blob/master/student_dashboard.png" width="800">
 
-Registration page:<img src="https://github.com/nishant-boro/parent-teacher-interaction-portal/blob/master/registration.png" width="500"> 
+Registration page:<br>
+<img src="https://github.com/nishant-boro/parent-teacher-interaction-portal/blob/master/registration.png" width="500"> 
 
 Parent Registration:<img src="https://github.com/nishant-boro/parent-teacher-interaction-portal/blob/master/register_parent.png" width="800">
 
