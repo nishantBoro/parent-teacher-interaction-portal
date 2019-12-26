@@ -4,9 +4,9 @@ A simple web application to provide a platform for teachers to interact with par
 
 Images:
 
-<img src="https://github.com/nishant-boro/parent-teacher-interaction-portal/dashboard_teacher.png" width="400"> <img src="https://github.com/nishant-boro/parent-teacher-interaction-portal/student_dashboard.png" width="400">
+<img src="https://github.com/nishant-boro/parent-teacher-interaction-portal/blob/master/dashboard_teacher.png" width="400"> <img src="https://github.com/nishant-boro/parent-teacher-interaction-portal/blob/master/student_dashboard.png" width="400">
 
-<img src="https://github.com/nishant-boro/parent-teacher-interaction-portal/registration.png" width="400"> <img src="https://github.com/nishant-boro/parent-teacher-interaction-portal/register_parent.png" width="400">
+<img src="https://github.com/nishant-boro/parent-teacher-interaction-portal/blob/master/registration.png" width="400"> <img src="https://github.com/nishant-boro/parent-teacher-interaction-portal/blob/master/register_parent.png" width="400">
 
 Installation:
 
